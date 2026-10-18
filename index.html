@@ -318,6 +318,8 @@ const ESCALERAS_APP = { n:"Escaleras de unidades", d:"Ficha de conversión de me
 const DECENA_APP = { n:"Diez veces más, diez veces menos", d:"Valor posicional a escala real: decena y décima, centena y centésima, millar y milésima, sin trampas de tamaño.", c:"Numeración", i:"<svg viewBox=\"0 0 24 24\" width=\"30\" height=\"30\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"><rect x=\"3\" y=\"3\" width=\"11\" height=\"11\" rx=\"1\"/><rect x=\"16.5\" y=\"16.5\" width=\"4.5\" height=\"4.5\" rx=\"0.6\"/></svg>", u:"https://yowah.codeberg.page/decima_decena/" };
 /* Tarjeta "Crecer sumando, crecer multiplicando" (lineal vs. exponencial) */
 const LINEAL_APP = { n:"Crecer sumando, crecer multiplicando", d:"La diferencia entre repetir una suma y repetir una multiplicación: x + a·n frente a x·aⁿ, con los problemas de clase.", c:"Potencias", i:"<svg viewBox=\"0 0 24 24\" width=\"30\" height=\"30\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"><path d=\"M4 20 L20 11\"/><path d=\"M4 20 C 12 19 17 14.5 20 4\"/></svg>", u:"https://yowah.codeberg.page/lineal_vs_exponencial/" };
+/* Tarjeta "Banco de trabajo": generador de fichas (enlace a su web, fuera del blob cifrado) */
+const BANCO_APP = { n:"Banco de trabajo", d:"Fichas a doble cara con su solucionario: sumas, restas, sumas y restas, sopas de letras y crucigramas con dibujos.", c:"Fichas", i:"<svg viewBox=\"0 0 24 24\" width=\"30\" height=\"30\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"><path d=\"M8.5 3H18a1 1 0 0 1 1 1v13\"/><rect x=\"5\" y=\"6.5\" width=\"11\" height=\"14.5\" rx=\"1\"/><path d=\"M8 11h5M8 14.5h5M8 18h3\"/></svg>", u:"https://yowahesp.github.io/Banco_de_trabajo/" };
 const enc = new TextEncoder();
 const dec64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => btoa(String.fromCharCode(...new Uint8Array(u)));
@@ -341,7 +343,7 @@ async function decryptApps(pw){
   return JSON.parse(new TextDecoder().decode(pt));
 }
 
-const PALETTE = { 'Numeración':'var(--cyan)','Potencias':'var(--magenta)','Divisibilidad':'var(--lime)','Fracciones':'#ffb347','S.M.D.':'#ff7a59','Geometría':'var(--gold)','Cálculo':'#b18cff' };
+const PALETTE = { 'Numeración':'var(--cyan)','Potencias':'var(--magenta)','Divisibilidad':'var(--lime)','Fracciones':'#ffb347','S.M.D.':'#ff7a59','Geometría':'var(--gold)','Cálculo':'#b18cff','Fichas':'#4f8bff' };
 let APPS = [], activeCat = 'Todas', query = '';
 const catColor = c => PALETTE[c] || 'var(--cyan)';
 
@@ -398,6 +400,10 @@ async function tryUnlock(){
       if(di < 0) di = APPS.findIndex(a => normTxt(a.n).includes('decimal'));
       const dcat = di >= 0 ? APPS[di].c : DECENA_APP.c;
       APPS.splice(di >= 0 ? di+1 : APPS.length, 0, { ...DECENA_APP, c:dcat });
+    }
+    // Añadir "Banco de trabajo" al final de la rejilla, con su categoría «Fichas»
+    if(!APPS.some(a => a.n === BANCO_APP.n)){
+      APPS.push({ ...BANCO_APP });
     }
     /* ---- fin tarjetas inyectadas ---- */
     msg.className = 'gate-msg ok'; msg.textContent = '✓ Acceso concedido';
